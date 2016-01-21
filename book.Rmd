@@ -60,7 +60,7 @@ You can write citations, too. For example, we are using the **bookdown** package
 
 # Polygons in 3d {#poly3}
 
-```{r,echo=FALSE,message=FALSE}
+```{r,echo=TRUE,message=FALSE, eval=FALSE}
 junk <- capture.output({
 library(raster)
 library(maptools)
@@ -268,7 +268,7 @@ Finally, to get to the entire point of this discussion let's triangulate the pol
 
 The R package `RTriangle` wraps Richard Shewchuk's Triangle library, allowing constrained Delaunay triangulations. To run this we need to make a Planar Straight Line Graph from the polygons, but this is fairly straightforward by tracing through paired vertices in the data set. The key parts of the PSLG are the vertices `P` and the segment indexes `S` defining paired vertices for each line segment. This is a "structural" index where the index values are bound to the actual size and shape of the vertices, as opposed to a more general but perhaps less efficient relational index. 
 
-```{rr, eval=FALSE}
+```{r, eval=FALSE}
 pslgraph <- mkpslg(gobject)
 dim(pslgraph$P)
 range(pslgraph$S)
@@ -330,7 +330,7 @@ Include a button for the animation
 
 ## Github, sfr
 
-There is ongoing work to upgrade R's Spatial support, but this is still wedded to the basic flat and dumb polygonal model used by open source projects.
+There is ongoing work to upgrade R's Spatial support, but this is still wedded to the basic flat and dumb polygonal model used by OGC. 
 
 
 
