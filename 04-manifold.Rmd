@@ -1,0 +1,18 @@
+# The Manifold GIS model
+
+## Drawings are points, lines, and areas
+
+Manifold drawings can contain all three kinds of vector topology. Other formats that can do this are MapInfo, SDTS (?), KML, etc. ..
+
+## Manifold projects are single-file documents
+
+The main reason this is nice is that we can easily encapsulate a body of work in a single file and shared it, without having to trace complicated sets of files. We can also treat a project document as database. (There are other ways to deal with Manifold via database technology.)
+
+## Connecting to Manifold with R
+
+### Complications
+
+Manifold uses its own internal specification for map projections. It can convert to WKT. R's package `rgdal` uses PROJ.4 strings which generally do not store sufficent detail to enable round-tripping. 
+
+R's Spatial classes need separate objects for different topological types. 
+

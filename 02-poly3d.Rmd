@@ -1,4 +1,4 @@
-# Polygons in 3d {#poly3}
+# Limitations of polygons {#poly3}
 
 ```{r,echo=TRUE,message=FALSE, eval=FALSE}
 junk <- capture.output({

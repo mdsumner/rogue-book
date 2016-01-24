@@ -1,0 +1,8 @@
+# Vector data
+
+There's no good name for these. 
+
+## Confounding geometry and topology
+
+## Graphics, gaming, 3D
+

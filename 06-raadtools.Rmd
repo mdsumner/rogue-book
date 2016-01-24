@@ -1,0 +1,13 @@
+# R AAD Tools 
+
+## The `raster package` model
+
+## Index by date
+
+## Extraction abstraction
+
+### Other tools
+
+xtracto, getData, NOAA packages, geoknife, ...
+
+

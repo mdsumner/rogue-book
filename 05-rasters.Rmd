@@ -1,0 +1,14 @@
+# Rasters
+
+
+
+## Grids and images
+
+## Confounding dimensions and attributes
+
+### Multi-band rasters
+
+### NetCDF and friends
+
+## Raster reprojection
+
