@@ -1,22 +1,72 @@
 # Introduction {#intro}
 
-You can label chapter and section titles using `{#label}` after them, e.g., we can reference Chapter \@ref(intro). If you do not manually label them, there will be automatic labels anyway, e.g., Chapter \@ref(methods).
 
-Figures and tables with captions will be placed in `figure` and `table` environments, respectively.
+## Opportunities in GIS
 
-```{r nice-fig, fig.cap='Here is a nice figure!', out.width='80%', fig.asp=.75, fig.align='center'}
-par(mar = c(4, 4, .1, .1))
-plot(pressure, type = 'b', pch = 19)
+Significant opportunities exist in the development of GIS. 
+
+## Polygons in GIS are not manifolds
+
+What is a polygon? 
+
+Wikipedia: 
+
+* a polygon is a plane figure that is bounded by a finite chain of straight line segments closing in a loop to form a closed chain or circuit
+
+```{r}
+p <- cbind(x = c(0, 0, 0.75, 1, 0.5, 0.8, 0.69, 0), 
+           y = c(0, 1, 1, 0.8, 0.7, 0.6, 0))
+plot(p)
+lines(p)
 ```
 
-Reference a figure by its code chunk label with the `fig:` prefix, e.g., see Figure \@ref(fig:nice-fig). Similarly, you can reference tables generated from `knitr::kable()`, e.g., see Table \@ref(tab:nice-tab).
+Couldn't be simpler. Note that we visited 0,0 twice, when we first started and at the final destination. What if we left out the last 0,0?
 
-```{r nice-tab}
-knitr::kable(head(iris, 20), caption = 'Here is a nice table!', booktabs = TRUE)
+```{r}
+npoints <- nrow(p)
+plot(p)
+lines(p[seq(npoints - 1), ])
 ```
 
-You can write citations, too. For example, we are using the **bookdown** package [@R-bookdown] in this sample book, which was built on top of R Markdown and **knitr** [@xie2015].
+Well it's obvious, we don't have a polygon so we just end up with a line. But what happened in the code `r plot(p)` - we don't see two points, though that is just because they both were plotted but are indistinguishable. Let's return to this point later. 
 
-## What's wrong with GIS? 
+
+What if we distinguish inside and outside of this part of the plane? 
+
+```{r}
+plot(p)
+polygon(p)
+```
+What happened? We have a close loop of line segments. 
+
+```{r}
+p1 <- p[-nrow(p), ]  ##remove the final 0,0 point
+plot(p1)
+polygon(p1)
+```
+
+Hmm no difference. 
+
+I'm not convinced that this is anything but a set of lines, so let's set the background colour first. 
+
+```{r}
+op <- par(bg = "lightblue")
+plot(p1)
+polygon(p1)
+```
+
+Still not convinced. We have to tell `polygon()` to fill the space it contains. 
+
+```{r}
+plot(p1)
+polygon(p1, col = "grey")
+par(op)
+```
+
+
+What is a line? 
+
+A line is a finite chain of straight line segments. 
+
 
 
