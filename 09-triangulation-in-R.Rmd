@@ -1,0 +1,34 @@
+# Triangulation in R
+
+Triangulation is available in several R packages, including triangulation by the Delaunay riangulation and/or Voronoi Tesselation, and "Constrained Delaunay" triangulation. 
+
+What is triangulation? 
+
+- not inference from remote signals
+- rule for connecting vertices in 2-space (we touch on higher dimensional topology and geometry here, but only briefly)
+- Wikipedia "... of a planar object is a subdivision into triangles . . . into simplices."
+
+What is Delaunay triangulation? 
+
+- a Delaunay triangulation satisifies the Delaunay condition that ["that the circumcircles of all triangles have empty interiors"](Wikipedia)
+- this is good for interpolation and visulization of physical surfaces
+
+What is Constrained Delaunay triangulation? 
+
+- interestingly this is a triangulation that *does not* satisfy the Delaunay condition, but it aims to be "mostly Delaunay" while including additional rules, such as
+- inclusion of input edges
+- minimum triangle area
+- minimum triangle interior angle
+- many other nuances (see Shewchuk)
+
+Where is triangulation used? 
+
+- visualization
+- vector fusion
+- geometry algorithms
+- interpolation
+- GIS stuff
+- etc. 
+
+## Packages that include Delaunay triangulation for R
+
