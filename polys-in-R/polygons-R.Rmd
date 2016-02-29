@@ -1,0 +1,284 @@
+---
+title: "Polygons in R"
+author: "Michael Sumner"
+date: "2016-03-04"
+output:
+  ioslides_presentation:
+    smaller: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, size = 0.5)
+```
+
+## What is a polygon? 
+
+> **Wikipedia: 
+> a polygon is a plane figure that is bounded by a finite chain of straight 
+> line segments closing in a loop to form a closed chain or circuit**
+
+Straight line segments? 
+
+Boundary coordinates connected by a traced "line"? 
+
+Does it matter? 
+
+## The simplest polygon
+
+```{r,echo=FALSE}
+tri <- cbind(c(0, 1, 1), c(0, 0, 1))
+op <- par(mfrow = rep(2, 2), xpd = NA)
+plot(tri, type = "n", axes = FALSE, xlab = "", ylab = "", main = "plane figure")
+polygon(tri, col = "grey", border = NA)
+plot(tri, type = "n", axes = FALSE, xlab = "", ylab = "", lty = 2, main = "straight line segments")
+
+polygon(tri, col = "grey", border = NA, density = 10, angle = 65)
+polygon(tri, col = "grey", border = NA, density = 10, angle = 10)
+
+#arrows(tri[c(1, 2, 3), 1], tri[c(1, 2, 3), 2], tri[c(2, 3, 1), 1], tri[c(2, 3, 1), 2], length = 0.25, lty = 1, lwd = 2, angle = 15)
+arrows(tri[c(1, 2, 3), 1], tri[c(1, 2, 3), 2], tri[c(2, 3, 1), 1], tri[c(2, 3, 1), 2], length = 0, lty = 1, lwd = 2, col = c("#1B9E77", "#D95F02", "#7570B3"))
+
+plot(tri, type = "n", axes = FALSE, xlab = "", ylab = "", lty = 2, main = "boundary coordinates")
+polygon(tri, col = "grey", border = NA)
+points(tri, pch = 1, cex = 1.2)
+
+plot(tri[c(1:3, 1), ], type = "l", axes = FALSE, xlab = "", ylab = "", lty = 2, main = "boundary line")
+par(op)
+```
+
+Aren't these all the same thing? 
+
+
+## Connected vertices
+
+```{r,echo=FALSE}
+xl <- c(-0.2, 1.35); yl <- c(-0.2, 1.2)
+p <- cbind(x = c(0, 0, 0.75, 1,   0.5, 0.8, 0.69, 0), 
+           y = c(0, 1, 1,    0.8, 0.7, 0.6, 0,    0))
+rownames(p) <- sprintf("pt%i", seq(nrow(p)))
+#print(p)
+
+#op <- par()
+layout(matrix(c(1, 1, 1, 2, 2, 2, 2, 2, 2), ncol = 3))
+plot(0, type = "n", axes = FALSE, ylim = c(0, 8), xlim = c(0, 1), 
+     xlab = "",  ylab = "")
+text(rep(0.2, nrow(p)), nrow(p):1, labels = sprintf("%s:  (%1.2f,%1.2f)", rownames(p), p[,1], p[,2]), cex = 0.9, pos = 4)
+
+
+plot(p, xlim = xl, ylim = yl)
+lines(p)
+text(p, labels = sprintf("%s:  (%1.2f,%1.2f)", rownames(p), p[,1], p[,2]), cex = 0.75,
+     pos = c(1, 3, 3, 4, 3, 4, 1, 3), col = c(rep("black", nrow(p)-1), "firebrick"))
+#par(op)
+```
+
+Note that we visited 0,0 twice, when we first started as "pt1" and at the final destination as "pt8". What if we left out the last 0,0?
+
+
+
+```{r}
+npoints <- nrow(p)
+plot(p, xlim = xl, ylim = yl)
+lines(p[seq(npoints - 1), ])
+```
+
+Well it's obvious, we don't have a polygon so we just end up with a line. But what happened in the code `r plot(p)` - we don't see two points, though that is just because they both were plotted but are indistinguishable. Let's return to this point later. 
+
+
+What if we distinguish inside and outside of this part of the plane? 
+
+```{r}
+plot(p, xlim = xl, ylim = yl)
+polygon(p)
+```
+
+What happened? We have a closed loop of line segments. 
+
+```{r}
+p1 <- p[-nrow(p), ]  ##remove the final 0,0 point
+plot(p1, xlim = xl, ylim = yl)
+polygon(p1)
+```
+
+Hmm no difference. 
+
+I'm not convinced that this is anything but a set of lines, so let's set the background colour first, in case it's a white polygon on a white background. 
+
+```{r}
+op <- par(bg = "lightblue")
+plot(p1, xlim = xl, ylim = yl)
+polygon(p1)
+```
+
+We are seeing right through this polygon. We have to tell `polygon()` to fill the space it contains with a colour (which might be white). 
+
+```{r}
+plot(p1, xlim = xl, ylim = yl)
+polygon(p1, col = "grey")
+par(op)
+```
+
+What if we have two of these kinds of objects? What goes wrong here? 
+
+```{r}
+p1 <- cbind(x = c(0, 0, 0.75, 1,   0.5, 0.8, 0.69, 0), 
+           y = c(0, 1, 1,    0.8, 0.7, 0.6, 0,    0))
+p2 <- cbind(x = c(0.2, 0.2, 0.3, 0.5, 0.5, 0.2), 
+            y = c(0.2, 0.4, 0.6, 0.4, 0.2, 0.2))
+
+pp <- rbind(p1, p2)
+
+plot(pp, xlim = xl, ylim = yl, main = "yikes!")
+
+polygon(rbind(p1, p2), col = "grey")
+
+```
+
+We have defined a *path* and we've told the polygon-drawing-tool to follow that path and fill space with a particular rule. (We what?). 
+
+One way to fix this is to plot the two parts separately, but we've cheated since the white "hole" is not a hole - we can no longer see the points on the inner ring. 
+
+```{r}
+
+plot(pp, xlim = xl, ylim = yl)
+
+polygon(p1, col = "grey")
+polygon(p2, col = "white")
+```
+
+The proper way to do this is is to separate the parts of the path where we don't want the path to stay connected. But, here `polygon` doesn't understand that it was meant to draw it as a hole. 
+
+```{r}
+pph <- rbind(p1, NA, p2)
+
+plot(pph, xlim = xl, ylim = yl)
+
+polygon(pph, col = "grey")
+
+
+```
+
+The only holes that `polygon` knows about are the ones determined by the evenodd rule. 
+
+```{r}
+pph1 <- rbind(p1, p2 + 0.35)
+
+plot(pph1, xlim = xl, ylim = yl)
+
+polygon(pph1, col = rgb(0, 0, 0, 0.2), fillOddEven = FALSE)
+
+
+```
+
+```{r}
+pph <- rbind(p1, NA, p2)
+
+plot(pph, xlim = xl, ylim = yl)
+
+polypath(pph, col = "grey", rule = "evenodd")
+
+
+```
+
+## polypath with no separating
+```{r}
+
+plot(pp, xlim = xl, ylim = yl, main = "yikes")
+polygon(rbind(p1, p2), col = "grey")
+
+op <- par(mfrow = c(2, 2))
+plot(pp, xlim = xl, ylim = yl, main = "winding, clock")
+polypath(rbind(p1, p2), col = "grey", rule = "winding")
+
+plot(pp, xlim = xl, ylim = yl, main = "winding, counter")
+polypath(rbind(p1[nrow(p1):1, ], p2[nrow(p2):1, ]), col = "grey", rule = "winding")
+
+plot(pp, xlim = xl, ylim = yl, main = "winding, clock/counter")
+polypath(rbind(p1, p2[nrow(p2):1, ]), col = "grey", rule = "winding")
+
+plot(pp, xlim = xl, ylim = yl, main = "winding, counter/clock")
+polypath(rbind(p1[nrow(p1):1, ], p2), col = "grey", rule = "winding")
+
+par(op)
+
+op <- par(mfrow = c(2, 2))
+plot(pp, xlim = xl, ylim = yl, main = "evenodd, clock")
+polypath(rbind(p1, p2), col = "grey", rule = "evenodd")
+
+plot(pp, xlim = xl, ylim = yl, main = "evenodd, counter")
+polypath(rbind(p1[nrow(p1):1, ], p2[nrow(p2):1, ]), col = "grey", rule = "evenodd")
+
+plot(pp, xlim = xl, ylim = yl, main = "evenodd, clock/counter")
+polypath(rbind(p1, p2[nrow(p2):1, ]), col = "grey", rule = "evenodd")
+
+plot(pp, xlim = xl, ylim = yl, main = "evenodd, counter/clock")
+polypath(rbind(p1[nrow(p1):1, ], p2), col = "grey", rule = "evenodd")
+par(op)
+```
+
+## polypath with NA separating
+```{r}
+
+op <- par(mfrow = c(2, 2))
+plot(pp, xlim = xl, ylim = yl, main = "winding, clock")
+polypath(rbind(p1, NA, p2), col = "grey", rule = "winding")
+
+plot(pp, xlim = xl, ylim = yl, main = "winding, counter")
+polypath(rbind(p1[nrow(p1):1, ], NA, p2[nrow(p2):1, ]), col = "grey", rule = "winding")
+
+plot(pp, xlim = xl, ylim = yl, main = "winding, clock/counter")
+polypath(rbind(p1, NA, p2[nrow(p2):1, ]), col = "grey", rule = "winding")
+
+plot(pp, xlim = xl, ylim = yl, main = "winding, counter/clock")
+polypath(rbind(p1[nrow(p1):1, ], NA, p2), col = "grey", rule = "winding")
+
+par(op)
+
+op <- par(mfrow = c(2, 2))
+plot(pp, xlim = xl, ylim = yl, main = "evenodd, clock")
+polypath(rbind(p1,NA,  p2), col = "grey", rule = "evenodd")
+
+plot(pp, xlim = xl, ylim = yl, main = "evenodd, counter")
+polypath(rbind(p1[nrow(p1):1, ],NA,  p2[nrow(p2):1, ]), col = "grey", rule = "evenodd")
+
+plot(pp, xlim = xl, ylim = yl, main = "evenodd, clock/counter")
+polypath(rbind(p1, NA, p2[nrow(p2):1, ]), col = "grey", rule = "evenodd")
+
+plot(pp, xlim = xl, ylim = yl, main = "evenodd, counter/clock")
+polypath(rbind(p1[nrow(p1):1, ],NA,  p2), col = "grey", rule = "evenodd")
+par(op)
+```
+
+
+Clockwise or counter-clockwise?
+
+Individual polygons. 
+
+Polygons that are holes? Or just overlapping? 
+
+Winding or the even-odd rule? 
+
+Formats for polygons: 
+ coordinates separated by a special value (i.e. NA)
+ sp Spatial classes
+ spatstat, maps, WKT, WKB, shapefiles, MapInfo files (TAB or MIF)
+ triangulations, constrained Delaunay, ear-clipping
+ 
+## Limits in R
+
+polygon, and polypath can only plot one colour at a time
+
+polypath can draw holes where we separate a hole from its outer ring by missing values, and use a rule for how to draw
+How far can we take this in R? 
+
+What about polygons on the sphere? Polygons on a topographic surface? 
+
+What is interesting about this polygon? It has a slight complex shape, i.e. it is not identical to the convex hull of the points. It also has 7 unique vertices, so is marginally complicated. Whas is interesting about these polygons? 
+
+```{r}
+library(maptools)
+data(wrld_simpl)
+
+
+
+
