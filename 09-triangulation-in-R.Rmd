@@ -32,3 +32,4 @@ Where is triangulation used?
 
 ## Packages that include Delaunay triangulation for R
 
+tripack?
