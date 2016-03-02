@@ -1,0 +1,33 @@
+---
+title: "Crazy ideas for Spatial in R"
+author: "Michael Sumner"
+date: "2 March 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Spatial in R
+
+R is wicked powerful for doing spatial in R. sp, raster, rgeos, ncdf4, spatstat, amazing. 
+
+Spatial generally is not good enough, GIS is stuck in the 1980s with shapefiles and coverages, and when it pokes out it's very bespoke and not very flexible. Flexible is the domain of modellers and scientific programmers, but too much flexibilty that doesn't take on the key advantages in GIS is painful. 
+
+## Key advantages in GIS
+
+Vector shapes are complex by default, and built to live on a database
+
+Affine transform is the default. 
+
+
+## Fuzzy areas
+
+Continuous vs. discrete is/isn't a strength in GIS/modelling. 
+
+
+
+## Crazy ideas
+
+gris is too much

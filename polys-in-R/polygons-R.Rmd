@@ -170,6 +170,41 @@ polygon(pph1, col = rgb(0, 0, 0, 0.2), fillOddEven = FALSE)
 
 ```
 
+
+Clockwise or counter-clockwise for coordinates?  It depends, there is the winding rule (it matters) and the evenodd rule (it doesn't matter), but those rules only apply for a polygon-path method if the polygon is self-intersecting. In GIS, it depends on the format, assumptions within a program, etc. 
+
+Individual polygons. 
+
+Polygons that are holes? Or just overlapping? 
+
+Winding or the even-odd rule? 
+
+Formats for polygons: 
+ coordinates separated by a special value (i.e. NA)
+ sp Spatial classes
+ spatstat, maps, WKT, WKB, shapefiles, MapInfo files (TAB or MIF)
+ triangulations, constrained Delaunay, ear-clipping
+ 
+## Limits in R
+
+polygon, and polypath can only plot one colour at a time
+- in practice this means sp draws every object separately (still pretty fast though)
+
+polypath can draw holes where we separate a hole from its outer ring by missing values, and use a rule for how to draw
+How far can we take this in R? 
+
+What about polygons on the sphere? Polygons on a topographic surface? 
+
+What is interesting about this polygon? It has a slight complex shape, i.e. it is not identical to the convex hull of the points. It also has 7 unique vertices, so is marginally complicated. Whas is interesting about these polygons? 
+
+```{r}
+library(maptools)
+data(wrld_simpl)
+```
+
+
+
+
 ```{r}
 pph <- rbind(p1, NA, p2)
 
@@ -248,37 +283,3 @@ plot(pp, xlim = xl, ylim = yl, main = "evenodd, counter/clock")
 polypath(rbind(p1[nrow(p1):1, ],NA,  p2), col = "grey", rule = "evenodd")
 par(op)
 ```
-
-
-Clockwise or counter-clockwise?
-
-Individual polygons. 
-
-Polygons that are holes? Or just overlapping? 
-
-Winding or the even-odd rule? 
-
-Formats for polygons: 
- coordinates separated by a special value (i.e. NA)
- sp Spatial classes
- spatstat, maps, WKT, WKB, shapefiles, MapInfo files (TAB or MIF)
- triangulations, constrained Delaunay, ear-clipping
- 
-## Limits in R
-
-polygon, and polypath can only plot one colour at a time
-
-polypath can draw holes where we separate a hole from its outer ring by missing values, and use a rule for how to draw
-How far can we take this in R? 
-
-What about polygons on the sphere? Polygons on a topographic surface? 
-
-What is interesting about this polygon? It has a slight complex shape, i.e. it is not identical to the convex hull of the points. It also has 7 unique vertices, so is marginally complicated. Whas is interesting about these polygons? 
-
-```{r}
-library(maptools)
-data(wrld_simpl)
-
-
-
-
