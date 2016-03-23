@@ -1,0 +1,110 @@
+---
+title: "Tables for spatial data"
+author: "Michael Sumner"
+date: "March 23, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Spatial data in R
+
+R has very strong support for spatial data manipulation: we can read in GIS vector layers (points, lines, areas) and raster layers (raster grids and images) as high-level objects with support for visualization, data analysis, geo-processing and export. 
+
+This provided in most part by the packages `sp`, `rgdal`, `raster`, `maptools` and `rgeos`. Predominantly this system uses a base level of `Spatial` classes, though `raster` has added a number of new types of data and extended the useability overall. 
+
+There are a number of limitations defined into the system: 
+
+1. vector data cannot be geometrically 3D (or 4D, or higher)
+2. vector data cannot be normalized to use shared vertices
+3. vector topology types cannot be mixed in a single layer (not completely true given GeometryCollection)
+4. raster data must have a **regular** georeferencing, with an affine transformation
+
+
+## Spatial data in R
+
+The formal `Spatial` vector classes use a tabular form for storing data in just one way. There is a table of attributes linked to each Spatial object, where an object may be a single point, or a connected line, or a set of polygons defining a single country. Each **part** of a topological object is stored as a separate 2-column matrix of X/Y values. In a sense these matrices are all *tabular* but they are stored in a recursive structure where that underlying pattern is ignored. 
+
+Here is an example with two polygons
+
+```{r}
+p_a1 <- cbind(x = c(0, 0, 0.75, 1, 0.5, 0.8, 0.69, 0), 
+           y = c(0, 1, 1, 0.8, 0.7, 0.6, 0, 0))
+p_a2 <- cbind(x = c(0.2, 0.2, 0.4, 0.2), 
+              y = c(0.25, 0.45, 0.4, 0.25))
+p_b1 <- cbind(x = c(0.69, 0.8, 1.1, 1.23, 0.69), 
+            y = c(0, 0.6, 0.63, 0.3, 0))
+
+library(raster)
+poly <- spPolygons(list(p_a1, p_a2[rev(seq(nrow(p_a2))), ]), p_b1, attr = data.frame(num = c(1, 2), name = c("poly1", "poly2"), property = c(0.1, 3), stringsAsFactors = FALSE))
+
+plot(poly, col = c("grey", "grey30"))
+```
+
+This *layer* consists of two complex areas, one is composed of a polygon with an inner polygonal *hole*, the other just a single polygon. The two areas share two vertices along one shared edge. 
+
+We need a relatively complicated structure to store this because 
+
+* each matrix of coordinates is a different size
+* at least one of the objects is *complex*, i.e. made up of two or more simple polygon rings
+* the attribute data (with two rows) is a completely different shape to the coordinate matrices. 
+
+
+## Normalization
+
+This object is very presentable: 
+
+```{r}
+poly
+```
+
+but if we look under the hood it's pretty hard to understand it.  
+
+```{r}
+
+str(poly)
+```
+
+Despite that this is not pretty, it faithfully stores everything required about our objects, including extra metadata on the *hole* status, the ring winding direction, a "labpt" (label point) that intersects with the object (not within a hole), a strict link of the object to its attributes, and the metadata on the map projection (coordinate reference system). 
+
+There are high-level methods for this high-level object. 
+
+We can extract sub-objects by indexing. 
+
+```{r}
+poly[2, ]
+```
+
+We can plot it. 
+
+```{r}
+spplot(poly)
+```
+
+This is a *high-level* plotting command that has not only plotted the object in its spatial form, but interpreted the data stored agains the objects. This gives a faceted plot with a facet for each separate attribute or column of data. 
+
+The `ggplot2` package gives another form of high-level plotting like this, but first we have to `fortify` our object into the single data frame required by the `ggplot2` plotting functions. 
+
+```{r}
+library(ggplot2)
+gpoly <- fortify(poly)
+
+gpoly
+
+```
+
+What is this? A single table with every coordinate from the Spatial object, with classifications for order (the order to trace around polygons), hole status, piece identifier, id (object), and group classification. (group is a combination of piece and id). 
+
+
+```{r}
+library(plyr)
+poly$id <- seq(nrow(poly))
+gpoly.df <- join(gpoly, as.data.frame(poly), by = "id")
+
+
+
+
+
+
