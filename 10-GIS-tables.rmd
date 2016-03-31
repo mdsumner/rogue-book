@@ -34,8 +34,8 @@ p_b1 <- cbind(x = c(0.69, 0.8, 1.1, 1.23, 0.69),
 library(raster)
 poly <- spPolygons(list(p_a1, p_a2[rev(seq(nrow(p_a2))), ]), p_b1, attr = data.frame(num = c(1, 2), name = c("poly1", "poly2"), property = c(0.1, 3), stringsAsFactors = FALSE))
 
-poly <- spPolygons(list(p_a1, p_a2, p_a3), p_b1, attr = data.frame(num = c(1, 2), name = c("poly1", "poly2"), property = c(0.1, 3), stringsAsFactors = FALSE))
-d <- fortify(poly[1,])
+poly <- spPolygons(list(p_a1, p_a2[rev(seq(nrow(p_a2))), ]), p_b1, attr = data.frame(num = c(1, 2), name = c("poly1", "poly2"), property = c(0.1, 3), stringsAsFactors = FALSE))
+d <- fortify(poly)
 
 asub <- d$group == '1.1'
 d[asub,"order"] <- rev(d[asub,"order"])
