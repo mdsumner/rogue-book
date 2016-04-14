@@ -5,68 +5,57 @@
 
 Significant opportunities exist in the development of GIS. 
 
-## Polygons in GIS are not manifolds
-
-What is a polygon? 
-
-Wikipedia: 
-
-* a polygon is a plane figure that is bounded by a finite chain of straight line segments closing in a loop to form a closed chain or circuit
-
-```{r}
-p <- cbind(x = c(0, 0, 0.75, 1, 0.5, 0.8, 0.69, 0), 
-           y = c(0, 1, 1, 0.8, 0.7, 0.6, 0))
-plot(p)
-lines(p)
-```
-
-Couldn't be simpler. Note that we visited 0,0 twice, when we first started and at the final destination. What if we left out the last 0,0?
-
-```{r}
-npoints <- nrow(p)
-plot(p)
-lines(p[seq(npoints - 1), ])
-```
-
-Well it's obvious, we don't have a polygon so we just end up with a line. But what happened in the code `r plot(p)` - we don't see two points, though that is just because they both were plotted but are indistinguishable. Let's return to this point later. 
+## Simple poly talk here
 
 
-What if we distinguish inside and outside of this part of the plane? 
 
-```{r}
-plot(p)
-polygon(p)
-```
-What happened? We have a close loop of line segments. 
+Individual Objects are - potentially-composite - *simple and valid* shapes with a topological dimension of 0 (zero - points), 1 (one - lines) or 2 ("polygons"). Technically these are called POINT, MULTIPOINT, LINESTRING,  MULTILINESTRING, POLYGON and MULTIPOLYGON as per the Open Geospatial Consortium’s (OGC) OpenGIS Specifications. The "MULTI" refers to the case where a single object is made up of more than one simple and valid POINT, LINESTRING, or POLYGON. 
 
-```{r}
-p1 <- p[-nrow(p), ]  ##remove the final 0,0 point
-plot(p1)
-polygon(p1)
-```
 
-Hmm no difference. 
+This is what PostGIS has to say: 
 
-I'm not convinced that this is anything but a set of lines, so let's set the background colour first. 
+> A POINT is inheritably simple as a 0-dimensional geometry object.
+> 
+> MULTIPOINTs are simple if no two coordinates (POINTs) are equal (have identical coordinate values).
+> 
+> A LINESTRING is simple if it does not pass through the same POINT twice (except for the endpoints, in which case it is referred to as a linear ring and additionally considered closed).
+> 
+> A MULTILINESTRING is simple only if all of its elements are simple and the only intersection between any two elements occurs at POINTs that are on the boundaries of both elements.
+> 
+> By definition, a POLYGON is always simple. It is valid if no two rings in the boundary (made up of an exterior ring and interior rings) cross. The boundary of a POLYGON may intersect at a POINT but only as a tangent (i.e. not on a line). A POLYGON may not have cut lines or spikes and the interior rings must be contained entirely within the exterior ring.
+> 
+> A MULTIPOLYGON is valid if and only if all of its elements are valid and the interiors of no two elements intersect. The boundaries of any two elements may touch, but only at a finite number of POINTs.
 
-```{r}
-op <- par(bg = "lightblue")
-plot(p1)
-polygon(p1)
-```
 
-Still not convinced. We have to tell `polygon()` to fill the space it contains. 
+http://postgis.net/docs/manual-1.4/ch04.html#OGC_Validity
+
+**NOTE:** I don't understand why PostGIS refers to "geometric dimension" here. The geometric dimension is usually 2, for X and Y (or longitude and latitude). How would we describe a LINESTRING that has X, Y, Z coordinate values? A 1D geometry with 3 ?? dimensions. To me this is a 1D topological shape with 3D geometry. 
+
+
+
+## Terminology summary 
+
+Entity | PostGIS | ggplot2::fortify | raster::geom | sp
+-------|---------|------------------|--------------|------
+Object | feature | id | object | *-named by class-*  
+Branch | element | piece | part |  *-named by class-*  
+Vertex | point   | long/lat | x/y | *coordinate*
+
+Note that `sp` is a bit inconsistent since it doesn't have Point and Points objects as analoges to Line/Polygon and Lines/Polygon - but the entire topic is rife with these confusing problems so let's move on. 
+
+
+## What do we do in R?
+
+In many ways it is easier to talk about the details in terms of the actual coordinates.
+
+### Polygon
+
+This is a Polygon
 
 ```{r}
-plot(p1)
-polygon(p1, col = "grey")
-par(op)
+
+
 ```
-
-
-What is a line? 
-
-A line is a finite chain of straight line segments. 
 
 
 
