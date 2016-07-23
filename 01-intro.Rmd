@@ -41,7 +41,11 @@ Object | feature | id | object | *-named by class-*
 Branch | element | piece | part |  *-named by class-*  
 Vertex | point   | long/lat | x/y | *coordinate*
 
-Note that `sp` is a bit inconsistent since it doesn't have Point and Points objects as analoges to Line/Polygon and Lines/Polygon - but the entire topic is rife with these confusing problems so let's move on. 
+Note that `sp` is a bit inconsistent since it doesn't have Point and Points objects as analoges to Line/Polygon and Lines/Polygons. Also, sp implemented a shapefile-like logic where a flat list of linestrings composes a multi-polygon and each is badged as hole or island, corresponding to its cooridinate order, but there's an ambiguity as to which hold belongs to which island. Simple features removes this ambiguity, since any Polygon has only one island, the first ring - and any subsequent ring is a hole in that island. sfr for R is an update from sp to reflect this newer standard. Also, ring order convention in sp is opposite to the SF standard . . .
+
+Illustration of the sp list-bag of holes/islands, verus the systematic sf version. (Also note that the rings must be internal to the island, but that's a different kind of validation. 
+
+But, the entire topic is rife with these confusing problems so let's move on. 
 
 
 ## What do we do in R?
