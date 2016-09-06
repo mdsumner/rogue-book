@@ -48,18 +48,5 @@ Illustration of the sp list-bag of holes/islands, verus the systematic sf versio
 But, the entire topic is rife with these confusing problems so let's move on. 
 
 
-## What do we do in R?
-
-In many ways it is easier to talk about the details in terms of the actual coordinates.
-
-### Polygon
-
-This is a Polygon
-
-```{r}
-
-
-```
-
 
 
